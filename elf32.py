@@ -183,7 +183,7 @@ class ELF32:
 		sh_flags =  SHF_WRITE + SHF_ALLOC
 		section_name_len = len(section_name)
 		offset = section_name_len % 16
-		section_name_len = 16 - offset + section_name_len
+		self.section_name_len = 16 - offset + section_name_len
 		sh_addr = section_name_len +  self.add_section_start_add
 		sh_size = section_size
 		sh_link = 0
@@ -196,5 +196,25 @@ class ELF32:
 		f.flush()
 
 	def add_section(self, section):
-		blame_count = self.add_section_start_add - os.path.getsize('copy.so')
-		print blame_count
+		blame_count = self.add_section_start_add - os.path.getsize('copy.so') #需要填充的0
+		f = self.newfile
+		f.write('\x00' * blame_count)			#一次性写如多个数据
+		f.write(self.section_name.encode())
+		f.write('\x00' * (self.section_name_len - len(self.section_name)))
+		length_section = len(section)
+		if length_section > self.section_size:
+			print '插入section失败，插入section长度大于规定的长度'
+			return
+		f.write(section.encode())
+		f.write('\x00' * (self.section_size - length_section))
+		f.flush()
+		self.change_program_first_LOAD()
+
+	def change_program_first_LOAD(self):
+		first_load_index = 0
+		for index in self.program_header:
+			if index['p_type'][0] == PT_LOAD:
+				break;
+			first_load_index = first_load_index + 1
+		file_offset = 52 + 32 * first_load_index + 16
+		print '%x' % file_offset
