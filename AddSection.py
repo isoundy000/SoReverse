@@ -10,6 +10,8 @@ from elf32 import ELF32
 def parseElfFile(sofile):
 	filedata = open(sofile, 'rb+')
 	ELFmanager = ELF32(filedata)
+	ELFmanager.add_section_header('jackzhous', 1000)
+	ELFmanager.add_section('dffdf')
 
 def main(so_file):
 	if os.path.exists(so_file) == False:
