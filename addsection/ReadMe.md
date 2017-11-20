@@ -2,5 +2,5 @@
 
 ## 脚本使用规则
 ```python
-python AddSection SoFileName SectionName SectionContent SectionLength
+python AddSection.py SoFileName SectionName SectionContent SectionLength
 ```
