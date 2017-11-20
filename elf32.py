@@ -184,7 +184,9 @@ class ELF32:
 		section_name_len = len(section_name)
 		offset = section_name_len % 16
 		self.section_name_len = 16 - offset + section_name_len
-		sh_addr = section_name_len +  self.add_section_start_add
+		sh_addr = self.section_name_len +  self.add_section_start_add
+		print self.section_name_len
+		print self.add_section_start_add
 		sh_size = section_size
 		sh_link = 0
 		sh_info = 0
@@ -208,8 +210,20 @@ class ELF32:
 		f.write(section.encode())
 		f.write('\x00' * (self.section_size - length_section))
 		f.flush()
+		self.change_section_header_number()
 		self.change_program_first_LOAD()
+		self.change_str_size_length()
 
+	#修改section header的数量在elf头里面
+	def change_section_header_number(self):
+		f = self.newfile
+		header_offset = 48
+		value = self.elf_header['e_shnum'][0] + 1
+		f.seek(header_offset, 0)
+		f.write(struct.pack('h', value))
+		f.flush()
+
+	#把新的section加入到program header里面去
 	def change_program_first_LOAD(self):
 		first_load_index = 0
 		for index in self.program_header:
@@ -217,4 +231,20 @@ class ELF32:
 				break;
 			first_load_index = first_load_index + 1
 		file_offset = 52 + 32 * first_load_index + 16
-		print '%x' % file_offset
+		copyfilesz = os.path.getsize('copy.so')
+		f = self.newfile
+		f.seek(file_offset, 0)
+		f.write(struct.pack('i', copyfilesz))
+		f.write(struct.pack('i', copyfilesz))
+		f.flush()
+
+	#修改str的size大小
+	def change_str_size_length(self):
+		new_str_len = self.add_section_start_add - self.str_string_offset + self.section_name_len
+		print new_str_len
+		sh_size_offset = self.elf_header['e_shoff'][0] + 40 * self.elf_header['e_shstrndx'][0] + 20
+		f = self.newfile
+		f.seek(sh_size_offset, 0)
+		f.write(struct.pack('i', new_str_len))
+		f.close()
+		print os.path.getsize('copy.so')
