@@ -16,7 +16,13 @@ DT_STRTAB =  5
 DT_SYMTAB =  6
 DT_STRSZ  = 10
 
+
+SYMBOL_SIZE = 16
+
+'''
 #解析program header的type为DYNAMIC的段
+out:dyn段偏移和大小
+'''
 def find_dyn():
 	dyn_loc = {}
 	for header in elfM.program_header:
@@ -28,7 +34,7 @@ def find_dyn():
 	return dyn_loc
 
 '''
-elf32_dyn格式
+out: 如下elf32_dyn格式的list
 typedef struct dynamic{
   Elf32_Sword d_tag;		类型
   union{
@@ -49,7 +55,85 @@ def parse_dyn(dyn_loc):
 		dyn['d_tag'] = struct.unpack('i', file.read(4))[0]
 		dyn['d_val_ptr'] = struct.unpack('i', file.read(4))[0]
 		dyn_list.append(dyn)
-		print dyn['d_tag']
+	return dyn_list
+
+'''
+解析dyn里面的重要字段,返回如下：
+in: parse_dyn(dyn_loc)
+{'hash_offset': 'hash段偏移',
+'str_offset':'',
+'sym_offset':'',
+'str_size':''}
+'''
+def parse_detail_dyn(dyn_list):
+	dyn_info = {}
+	for dyn in dyn_list:
+		if DT_HASH == dyn['d_tag']:
+			dyn_info['hash_offset'] = dyn['d_val_ptr']
+			print 'hash_offset %x' %  dyn['d_val_ptr']
+		elif DT_STRTAB == dyn['d_tag']:
+			dyn_info['str_offset'] = dyn['d_val_ptr']
+			print 'str_offset %x' %  dyn['d_val_ptr']
+		elif DT_SYMTAB == dyn['d_tag']:
+			dyn_info['sym_offset'] = dyn['d_val_ptr']
+			print 'sym_offset %x' %  dyn['d_val_ptr']
+		elif DT_STRSZ == dyn['d_tag']:
+			dyn_info['str_size'] = dyn['d_val_ptr']
+			print 'str_size %x' %  dyn['d_val_ptr']
+	return dyn_info
+
+'''
+以下函数target_fun_symbol的结构
+typedef struct elf32_sym{
+  Elf32_Word        st_name;
+  Elf32_Addr        st_value;
+  Elf32_Word        st_size;
+  unsigned char        st_info;
+  unsigned char        st_other;
+  Elf32_Half        st_shndx;
+}
+'''
+def parse_sym(binary_data):
+	sym_info = {}
+	sym_info['st_name'],sym_info['st_value'],sym_info['st_size'],sym_info['st_info'],sym_info['st_other'],sym_info['st_shndx'] = struct.unpack('3i2ch', binary_data)
+	print '%x -- %x\n' % (sym_info['st_name'],sym_info['st_shndx'])
+	return sym_info
+
+
+
+def location_function(function_name, dyn_detail, function_name_data):
+	print function_name_data
+	fun_name_hash = elfhash(function_name)
+	file.seek(dyn_detail['hash_offset'], 0)
+	nbucket = struct.unpack('i', file.read(4))[0]
+	nchain  = struct.unpack('i', file.read(4))[0]
+	#查找目标函数位置算法
+	print 'hash = %d' % fun_name_hash
+	fun_name_hash = fun_name_hash % nbucket
+	#8是跳过开头nbucket和nchain,内容每个占4个字节
+	offset = dyn_detail['hash_offset'] + 8 + 4 * fun_name_hash
+	file.seek(offset, 0)
+	target_fun_index = struct.unpack('i', file.read(4))[0]
+	print 'nbucket = %d, hash = %d, fun_index = %d\n' % (nbucket, fun_name_hash, target_fun_index)
+	offset = dyn_detail['sym_offset'] + SYMBOL_SIZE * target_fun_index
+	file.seek(offset, 0)
+	target_fun_symbol = parse_sym(file.read(16))
+
+
+
+
+#将函数名转换为hash值
+def elfhash(function_name):
+	length = len(function_name)
+	value = 0
+	temp = 0
+	for i in range(length):
+		value = (value << 4) + ord(function_name[i])
+		temp = value & 0xf0000000
+		value = value ^ temp
+		value = (temp >> 24) ^  value
+	return value
+
 
 def main(sofile, function_name):
 	if os.path.exists(sofile) == False:
@@ -60,7 +144,12 @@ def main(sofile, function_name):
 	file = open(sofile, 'rb+')
 	elfM = ELF32(file)
 	dyn_loc = find_dyn()
-	parse_dyn(dyn_loc)
+	dyn_list = parse_dyn(dyn_loc)
+	dyn_detail = parse_detail_dyn(dyn_list)
+	file.seek(dyn_detail['str_offset'], 0)
+	function_name_data = file.read(dyn_detail['str_size'])
+	location_function(function_name, dyn_detail, function_name_data)
+	file.close()
 
 
 if __name__ == '__main__':
