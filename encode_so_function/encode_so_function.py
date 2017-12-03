@@ -118,8 +118,34 @@ def location_function(function_name, dyn_detail, function_name_data):
 	offset = dyn_detail['sym_offset'] + SYMBOL_SIZE * target_fun_index
 	file.seek(offset, 0)
 	target_fun_symbol = parse_sym(file.read(16))
+	print 'find func %x\n' % target_fun_symbol['st_name']
+	print '%s\n' % function_name_data[target_fun_symbol['st_name'] + 10]
+	if isEqual(function_name_data, function_name, target_fun_symbol['st_name']):
+		print 'find'
+	else:
+		print 'not find'
 
-
+'''
+比较的函数
+source 长度不定，字符串
+target 长度确定，是字符串
+start_compare_offset soruce开始比较的偏移
+'''
+def isEqual(source, target, start_compare_offset):
+	if source is None or target is None:
+		return False
+	len_target = len(target)
+	len_source = len(source)
+	i = 0
+	while i < len_target:
+		print source[i + start_compare_offset],
+		if source[i + start_compare_offset] != target[i]:
+			return False
+		i = i + 1
+	print ''
+	return True
+		
+	
 
 
 #将函数名转换为hash值
@@ -148,6 +174,7 @@ def main(sofile, function_name):
 	dyn_detail = parse_detail_dyn(dyn_list)
 	file.seek(dyn_detail['str_offset'], 0)
 	function_name_data = file.read(dyn_detail['str_size'])
+#	print function_name_data
 	location_function(function_name, dyn_detail, function_name_data)
 	file.close()
 
