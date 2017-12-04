@@ -1,10 +1,12 @@
 #!/bin/bash
 #encoding=utf-8
 
-from elf32 import ELF32 
 import struct		#unpack出来的数据都是元组，搞不懂是为什么
 import os
 import sys
+
+sys.path.append('..')
+from addsection.elf32 import ELF32
 
 elfM = None
 PT_DYNAMIC = 2
