@@ -102,7 +102,7 @@ def parse_sym(binary_data):
 
 
 def location_function(function_name, dyn_detail, function_name_data):
-	print function_name_data
+	#print function_name_data
 	fun_name_hash = elfhash(function_name)
 	file.seek(dyn_detail['hash_offset'], 0)
 	nbucket = struct.unpack('i', file.read(4))[0]
@@ -118,12 +118,48 @@ def location_function(function_name, dyn_detail, function_name_data):
 	offset = dyn_detail['sym_offset'] + SYMBOL_SIZE * target_fun_index
 	file.seek(offset, 0)
 	target_fun_symbol = parse_sym(file.read(16))
-	print 'find func %x\n' % target_fun_symbol['st_name']
-	print '%s\n' % function_name_data[target_fun_symbol['st_name'] + 10]
+	print 'find func %s' % target_fun_symbol
 	if isEqual(function_name_data, function_name, target_fun_symbol['st_name']):
 		print 'find'
 	else:
 		print 'not find'
+		loop_look(function_name, dyn_detail, function_name_data, target_fun_index, nbucket)
+#循环查找函数
+def loop_look(function_name, dyn_detail, function_name_data, funindex, nbucket):
+	while True:
+		funindex_offset = dyn_detail['hash_offset'] + 4 * (2 + nbucket + funindex)
+		print 'fun index offset %x' % funindex_offset
+		file.seek(funindex_offset, 0)
+		funindex = struct.unpack('i', file.read(4))[0]
+		print 'fun index %x' % funindex
+		funsym_offset = dyn_detail['sym_offset'] + funindex * SYMBOL_SIZE
+		file.seek(funsym_offset, 0)
+		funsym = parse_sym(file.read(16))
+		print 'funsym %s' % funsym
+		if isEqual(function_name_data, function_name, funsym['st_name']):
+			print 'find'
+			encode_fun(funsym)
+			return True
+		else:
+			print '----not find----'
+		
+# 加密函数
+def encode_fun(fun_sym):
+	file.seek(0, 0)
+	newfile = open('copy.so', 'wb')
+	newfile.write(file.read())
+	fun_offset = fun_sym['st_value'] - 1
+	fun_size   = fun_sym['st_size'] / 2
+	newfile.seek(fun_offset, 0)
+	file.seek(fun_offset, 0)
+	for i in range(fun_size):
+		b_data = struct.unpack('H', file.read(2))[0]	#异或操作进行加密
+		value = b_data ^ 0xffff
+		newfile.write(struct.pack('H', value))
+	newfile.flush()
+	newfile.close()
+	print 'newfile length is %d' % os.path.getsize('copy.so') 
+	print 'file length is %d' % os.path.getsize('libtest.so') 
 
 '''
 比较的函数
@@ -180,6 +216,11 @@ def main(sofile, function_name):
 
 
 if __name__ == '__main__':
+	defaultencoding = 'utf-8'
+	if sys.getdefaultencoding() != defaultencoding:
+		reload(sys)
+		sys.setdefaultencoding(defaultencoding)
+		print sys.getdefaultencoding()
 	print "---------------------------脚本使用规则---------------------------"
 	print "python AddSection SoFileName FunctionName"
 	main(sys.argv[1], sys.argv[2])
