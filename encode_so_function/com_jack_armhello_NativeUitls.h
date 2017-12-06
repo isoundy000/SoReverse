@@ -25,6 +25,8 @@ JNIEXPORT jstring JNICALL Java_com_jack_armhello_NativeUitls_getString
   (JNIEnv *, jclass, jint);
 
 
+static unsigned elfhash(const char *_name);
+
 static unsigned int getLibAddr();
 
 static void print_debug(const char *msg);

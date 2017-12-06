@@ -43,6 +43,8 @@ static char getTargetFun(unsigned long base, const char *funname, funcInfo *info
 	Elf32_Off dyn_off;
 	Elf32_Dyn *dyn;
 	Elf32_Addr dyn_symbol, dyn_hash, dyn_strtab;
+	Elf32_Sym *funSym;
+	unsigned int funhash;
 
 	ehdr = (Elf32_Ehdr *)base;
 	phdr = (Elf32_Phdr *)(base + ehdr->e_phoff);
@@ -86,10 +88,35 @@ static char getTargetFun(unsigned long base, const char *funname, funcInfo *info
 			__android_log_print(ANDROID_LOG_INFO, "JNITag","strsiz offset size: 0x%x\n", dyn_strsiz);
 	}
 
+	if(flag & 0x0f != 0x0f){
+		print_debug("find dyn failed");
+		goto _error;
+	}	
+	dyn_symbol += base;
+	dyn_hash += base;
+	dyn_strtab += base;
+	dyn_strsiz += base;
 	
+	funhash = elfhash(funname);
+	funSym = (Elf32_Sym *)dyn_symbol;
+
 	_error:
 		return -1;
 }
+
+static unsigned elfhash(const char *_name)  
+{  
+    const unsigned char *name = (const unsigned char *) _name;  
+    unsigned h = 0, g;  
+  
+    while(*name) {  
+        h = (h << 4) + *name++;  
+        g = h & 0xf0000000;  
+        h ^= g;  
+        h ^= g >> 24;  
+    }  
+    return h;  
+}  
 
 
 static unsigned int getLibAddr(){
