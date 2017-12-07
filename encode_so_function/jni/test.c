@@ -5,18 +5,22 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <elf.h>
+#include "elf.h"
 #include <sys/mman.h>
 #include "com_jack_armhello_NativeUitls.h"
 
 
+JNIEXPORT jstring JNICALL Java_com_jack_armhello_NativeUitls_getString(JNIEnv *env, jclass jobj, jint number){
+	int n = number;
+	return (*env)->NewStringUTF(env, "decode test");
+}
 
 void init_getString() __attribute__((constructor));
 
 
 static void print_debug(const char *msg){
 	#ifdef DEBUG
-		__android_log_print(ANDROID_LOG_INFO, "JNITag","JNITag", msg);
+		__android_log_print(ANDROID_LOG_INFO, "JNITag","%s", msg);
 	#endif
 }
 
@@ -34,9 +38,9 @@ void init_getString(){
 	}
 	npage = info.st_size / PAGE_SIZE + (info.st_size % PAGE_SIZE == 0 ? 0 : 1);
 	__android_log_print(ANDROID_LOG_INFO, "JNITag", "npage = %d pagesize = %d\n", npage, PAGE_SIZE);
-	if(mprotect((void *)((base + info->st_value) / PAGE_SIZE * PAGE_SIZE), 4096 * npage, PROT_READ | PROT_EXEC | PROT_WRITE) != 0){
+	if(mprotect((void *)((base + info.st_value) / PAGE_SIZE * PAGE_SIZE), 4096 * npage, PROT_READ | PROT_EXEC | PROT_WRITE) != 0){
 		print_debug("change privilege failed");
-		reutrn;
+		return;
 	}
 
 	//解码
@@ -44,9 +48,9 @@ void init_getString(){
 		char *addr = (char *)(base + info.st_value - 1 + i);
 		*addr = ~(*addr);
 	}
-	if(mprotect((void *)((base + info->st_value) / PAGE_SIZE * PAGE_SIZE), 4096 * npage, PROT_READ | PROT_EXEC) != 0){
+	if(mprotect((void *)((base + info.st_value) / PAGE_SIZE * PAGE_SIZE), 4096 * npage, PROT_READ | PROT_EXEC) != 0){
 		print_debug("change privilege failed");
-		reutrn;
+		return;
 	}
 	
 	print_debug("decode success");
@@ -84,31 +88,32 @@ static char getTargetFun(unsigned long base, const char *funname, funcInfo *info
 	}
 
 	dyn_off = phdr->p_vaddr + base;
-	dyn_size = phdr->filesz;
+	dyn_size = phdr->p_filesz;
 	__android_log_print(ANDROID_LOG_INFO, "JNITag","dyn offset address: 0x%x dyn_size: 0x%x\n", dyn_off, dyn_size);
 	flag = 0;
 	for(i = 0; i < dyn_size / (sizeof(Elf32_Dyn)); i++){
-		dyn = (Elf32_Dyn *)(dyn_vaddr + i * sizeof(Elf32_Dyn));
+		dyn = (Elf32_Dyn *)(dyn_off + i * sizeof(Elf32_Dyn));
 		if(dyn->d_tag == DT_SYMTAB){
-			dyn_symbol = (dyn->un).d_ptr;
+			dyn_symbol = (dyn->d_un).d_ptr;
 			flag += 1;
 			__android_log_print(ANDROID_LOG_INFO, "JNITag","symbol offset address: 0x%x\n", dyn_symbol);
 		}else if(dyn->d_tag == DT_HASH){
-			dyn_hash = (dyn->un).d_ptr;
+			dyn_hash = (dyn->d_un).d_ptr;
 			flag += 2;
 			__android_log_print(ANDROID_LOG_INFO, "JNITag","hash offset address: 0x%x\n", dyn_hash);
 		}else if(dyn->d_tag == DT_STRTAB){
-			dyn_strtab = (dyn->un).d_ptr;
+			dyn_strtab = (dyn->d_un).d_ptr;
 			flag += 4;
 			__android_log_print(ANDROID_LOG_INFO, "JNITag","strtab offset address: 0x%x\n", dyn_strtab);
 			
-		}else if(dyn->d_tag == DT_STRTAB){
-			dyn_strsiz = (dyn->un).d_val;
+		}else if(dyn->d_tag == DT_STRSZ){
+			dyn_strsiz = (dyn->d_un).d_val;
 			flag += 8;
 			__android_log_print(ANDROID_LOG_INFO, "JNITag","strsiz offset size: 0x%x\n", dyn_strsiz);
+		}
 	}
 
-	if(flag & 0x0f != 0x0f){
+	if((flag & 0x0f) != 0x0f){
 		print_debug("find dyn failed");
 		goto _error;
 	}	
@@ -141,15 +146,14 @@ static char getTargetFun(unsigned long base, const char *funname, funcInfo *info
 	}
 	info->st_value = (funSym + i)->st_value;
 	info->st_size = (funSym + i)->st_size;
-	__android_log_print(ANDROID_LOG_INFO, "JNITag","st_value: 0x%x st_size 0x%x\n", info->st_value, st_size);
+	__android_log_print(ANDROID_LOG_INFO, "JNITag","st_value: 0x%x st_size 0x%x\n", info->st_value, info->st_size);
 	
 	return 0;
 	_error:
 		return -1;
 }
 
-static unsigned elfhash(const char *_name)  
-{  
+static unsigned elfhash(const char *_name){  
     const unsigned char *name = (const unsigned char *) _name;  
     unsigned h = 0, g;  
   

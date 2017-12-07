@@ -123,6 +123,7 @@ def location_function(function_name, dyn_detail, function_name_data):
 	print 'find func %s' % target_fun_symbol
 	if isEqual(function_name_data, function_name, target_fun_symbol['st_name']):
 		print 'find'
+		encode_fun(target_fun_symbol)
 	else:
 		print 'not find'
 		loop_look(function_name, dyn_detail, function_name_data, target_fun_index, nbucket)
