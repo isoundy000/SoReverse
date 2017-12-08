@@ -44,8 +44,9 @@ void init_getString(){
 	}
 
 	//解码
-	for(i = 0; i < info.st_size -1; i++){
+	for(i = 0; i < info.st_size; i++){
 		char *addr = (char *)(base + info.st_value - 1 + i);
+		__android_log_print(ANDROID_LOG_INFO, "JNITag", "decode %x", *addr);
 		*addr = ~(*addr);
 	}
 	if(mprotect((void *)((base + info.st_value) / PAGE_SIZE * PAGE_SIZE), 4096 * npage, PROT_READ | PROT_EXEC) != 0){
