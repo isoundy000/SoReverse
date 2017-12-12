@@ -15,7 +15,7 @@ JNIEXPORT jstring JNICALL Java_com_jack_armhello_NativeUitls_getString(JNIEnv *e
 	return (*env)->NewStringUTF(env, "decode test");
 }
 
-void init_getString() __attribute__((constructor));
+void init_decoe() __attribute__((constructor));
 
 
 static void print_debug(const char *msg){
@@ -24,7 +24,7 @@ static void print_debug(const char *msg){
 	#endif
 }
 
-void init_getString(){
+void init_decode(){
 	const char target_fun[] = "Java_com_jack_armhello_NativeUitls_getString";
 	funcInfo info;
 	int i;
@@ -183,6 +183,7 @@ static unsigned int getLibAddr(){
 		goto _error;
 	}
 
+	__android_log_print(ANDROID_LOG_INFO, "JNITag","current pid is %d", pid);
 	while(fgets(buf, sizeof(buf), fp)){
 		if(strstr(buf, soName)){
 			temp = strtok(buf, "-");

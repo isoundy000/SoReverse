@@ -31,7 +31,7 @@ static unsigned int getLibAddr();
 
 static void print_debug(const char *msg);
 
-void init_getString();
+void init_decode();
 
 
 static char getTargetFun(unsigned long base, const char *funname, funcInfo *info);
