@@ -7,4 +7,4 @@
 ida工具动态调试so文件工具
 
 ## encode_so_function
-加密so文件内部的函数
+so文件函数的加密与解密
