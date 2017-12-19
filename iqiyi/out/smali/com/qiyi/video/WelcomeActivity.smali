@@ -2817,7 +2817,7 @@
 .method protected onCreate(Landroid/os/Bundle;)V
     .locals 4
 
-invoke-static {}, Landroid/os/Debug;->waitForDebugger()V
+#invoke-static {}, Landroid/os/Debug;->waitForDebugger()V
 
     const/4 v2, 0x1
 
