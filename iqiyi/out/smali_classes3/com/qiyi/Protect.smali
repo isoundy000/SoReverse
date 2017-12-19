@@ -47,12 +47,17 @@
 .end method
 
 .method public static getContent(Ljava/lang/Object;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-    .locals 1
+    .locals 2
 
     invoke-static {p0, p1, p2, p3}, Lcom/qiyi/Protect;->getContentJNI(Ljava/lang/Object;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
+	const-string v1, "j_tag"
+
+	invoke-static {v1, p2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+	invoke-static {v1, p3}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     return-object v0
 .end method
 
