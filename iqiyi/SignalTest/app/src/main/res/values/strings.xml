@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">SignalTest</string>
-    <string name="signal_test">信号检测</string>
-    <string name="wifi">当前网络为wifi,信号强度为：</string>
-    <string name="g_4">当前网络为4G移动网络,信号强度为：</string>
-    <string name="g_2">当前网络为2G移动网络,信号强度为：</string>
-    <string name="g_none">当前没有网络,信号强度为：</string>
-    <string name="none">当前网络错误,信号强度为：</string>
-</resources>
