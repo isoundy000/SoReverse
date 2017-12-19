@@ -106,6 +106,7 @@
     return-void
 .end method
 
+#这个方法事底部的导航兰监听，重点关注
 .method private JJ(I)V
     .locals 2
 
@@ -122,6 +123,8 @@
     move-result v1
 
     aget v0, v0, v1
+	
+	const-string v1, "j_tag"
 
     packed-switch v0, :pswitch_data_0
 
@@ -130,13 +133,14 @@
 
     :pswitch_0
     const-string/jumbo v0, "rec"
-
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
     goto :goto_0
 
     :pswitch_1
     const-string/jumbo v0, "hot"
+invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
@@ -145,6 +149,7 @@
     :pswitch_2
     const-string/jumbo v0, "nav"
 
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
     goto :goto_0
@@ -152,6 +157,7 @@
     :pswitch_3
     const-string/jumbo v0, "my"
 
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
     goto :goto_0
@@ -159,6 +165,7 @@
     :pswitch_4
     const-string/jumbo v0, "find"
 
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
     goto :goto_0
@@ -166,6 +173,7 @@
     :pswitch_5
     const-string/jumbo v0, "vip"
 
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
     goto :goto_0
@@ -173,6 +181,8 @@
     :pswitch_6
     const-string/jumbo v0, "find"
 
+	const-string v1, "j_tag1"
+	invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
     invoke-static {v0}, Lorg/qiyi/android/video/ui/com5;->Sp(Ljava/lang/String;)V
 
     goto :goto_0
@@ -715,7 +725,7 @@
 
     iget-object v0, p0, Lorg/qiyi/android/video/MainActivity;->hla:Lorg/qiyi/video/homepage/viewgroup/ScrollLinearLayout;
 
-    #???setMainContainter,??????????org.qiyi.android.video.pagemgr.com7?setContainer???????com7????mContainer????
+    #方法setMainContainter,最终调用org.qiyi.android.video.pagemgr.com的setContainer方法，实质是com7设置mContainer这个对象
     invoke-virtual {p0, v0}, Lorg/qiyi/android/video/MainActivity;->setMainContainer(Landroid/view/ViewGroup;)V
 
     const/4 v0, -0x1
@@ -878,7 +888,7 @@
 .method public cnc()V
     .locals 2
 
-    #?????????????????hAN???hAN?org.qiyi.android.video.pagemgr.lpt9???mIUiAutoMap???hashmap???????????
+    #父类成员为hAN，这个实例hAN属于org.qiyi.android.video.pagemgr.lpt9，他里面的成员mIUiAutoMap是一个hashmap，将所有class实例放到里面
     sget-object v0, Lorg/qiyi/video/homepage/e/aux;->jpD:Lorg/qiyi/video/homepage/e/aux;
 
     invoke-virtual {v0}, Lorg/qiyi/video/homepage/e/aux;->ordinal()I
