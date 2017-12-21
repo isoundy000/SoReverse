@@ -58,3 +58,7 @@ org.qiyi.android.video.MainActivity的布局使用代理类的方式掩藏了，
 布局文件是：main_phone_new.xml， 里面的布局都是通过java代码添加进去的，可以在MainActivity里面findViewById找到布局主要的两个ScrollLinearLayout、ViewStub组件，在MainActivity里面分别叫：hla、hle
 
 ## org.qiyi.context.mode.nul是一个sharedpreference存储的类
+
+## 爱奇艺签名验证
+
+1. 解包在和包App无法连接网络，抓包发现正常http请求和和包之后的http请求缺少header头t和sign参数；可以通过grep找到sign和t位于com.qiyi.android.corejar.utils.Utility里面的getSecurityHeaderInfor方法，这个方法回去调用native的getContentJNI，native正常情况返回是一个带有&的字符串，异常就会error；正常情况参数会被分析t和sign，然后封装到map里面，最后通过Http请求出去

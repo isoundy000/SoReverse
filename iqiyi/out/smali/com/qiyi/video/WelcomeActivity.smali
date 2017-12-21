@@ -2820,7 +2820,7 @@
     const/4 v2, 0x1
 
     const/4 v3, 0x0
-invoke-static {}, Landroid/os/Debug;->waitForDebugger()V
+#invoke-static {}, Landroid/os/Debug;->waitForDebugger()V
     const-string/jumbo v0, "Application#StartupError"
 
     invoke-static {v0}, Lcom/qiyi/qyapm/agent/android/tracing/TraceMachine;->leave(Ljava/lang/String;)V
