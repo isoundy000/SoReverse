@@ -2819,7 +2819,7 @@
 
     const/4 v2, 0x1
 
-    const/4 v3, 0x0
+   const/4 v3, 0x0
 #invoke-static {}, Landroid/os/Debug;->waitForDebugger()V
     const-string/jumbo v0, "Application#StartupError"
 
