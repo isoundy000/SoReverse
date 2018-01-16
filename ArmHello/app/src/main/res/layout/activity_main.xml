@@ -34,4 +34,10 @@
         android:text="getAntiFraudInfo"
         android:id="@+id/btn_getAntiFraudInfo"/>
 
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="other"
+        android:id="@+id/other"/>
 </LinearLayout>
