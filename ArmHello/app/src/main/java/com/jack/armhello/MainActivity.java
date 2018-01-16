@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     static {
         System.loadLibrary("protect");
+        System.loadLibrary("test");
     }
 
     @Override
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn).setOnClickListener(this);
         findViewById(R.id.btn_getAntiFraudInfo).setOnClickListener(this);
         findViewById(R.id.btn_getEmuInfo).setOnClickListener(this);
+        findViewById(R.id.other).setOnClickListener(this);
         tv = (TextView)findViewById(R.id.tv_show);
 
     }
@@ -53,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btn_getEmuInfo:
                 str = "getContentNI: " + Protect.getEmuInfo(MainActivity.this);
+                break;
+
+            case R.id.other:
+                str = "getOther " + NativeUitls.getString(1, "3242sdfsd");
                 break;
         }
 
