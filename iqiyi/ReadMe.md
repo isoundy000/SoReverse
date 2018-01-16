@@ -69,6 +69,9 @@ __部分汇编：__
 
 ![native_register](native_register.png)
 
+### 查看protect.so的汇编
+
+getContentJNI方法进去，在1581E处进入了视图分支，就是可以看到调用框架图的点
 # 解决过程中的FAQ
 ## ida动态调试一直获取不到客户端的进行？？？
 
