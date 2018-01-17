@@ -5,7 +5,7 @@ package com.jack.armhello;
  */
 
 public class NativeUitls {
-    public static native String getString(int numbe, String string);
+    public static native String getString(int numbe, int aa,  String string);
 
     public static native String registerFunNative(int number);
 
