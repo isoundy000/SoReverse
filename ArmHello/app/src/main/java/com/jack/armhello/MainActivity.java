@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.other:
-                str = "getOther " + NativeUitls.getString(1, "3242sdfsd");
+                str = "getOther " + NativeUitls.getString(1, 10,  "3242sdfsd");
                 break;
         }
 
