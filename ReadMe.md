@@ -15,5 +15,8 @@ so文件函数的加密与解密
 ## nativeRegisterMethods
 native动态注册Java方法
 
+## adFilter
+视频广告过滤
+
 ## utils
 上诉多个文件夹都需要的东西
